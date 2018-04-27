@@ -20,11 +20,50 @@ body {
 }
 
 .layer-controls {
+  position: relative;
   display: flex;
   padding: 0.5em;
+  :last-child {
+    flex: 1;
+  }
+}
+
+.url-control {
+  padding: 0.2em;
+  border-radius: 3px;
+  border: 1px solid #ddd;
+  width: 30%;
+  margin-right: 1em;
+}
+
+.login-button {
+  background: #aaf;
+  border: 1px solid #ddd;
 }
 
 .map-container {
   flex: 1;
   background: #ddd;
+  padding: 2em;
+}
+
+.collapse-button {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateY(80%) translateX(-50%);
+  background: white;
+  border: 1px solid #ddd;
+  &:hover {
+    background: #ddd;
+  }
+  &:active {
+    background: #ccc;
+  }
+}
+
+button {
+  cursor: pointer;
+  border-radius: 3px;
+  padding: 0.5em;
 }

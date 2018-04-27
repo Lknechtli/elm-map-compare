@@ -1,21 +1,45 @@
 module Main exposing (..)
 
 import Html exposing (Html, text, div, h1, img, input, button)
-import Html.Attributes exposing (src, class, classList, placeholder)
+import Html.Attributes exposing (src, class, classList, placeholder, type_, value)
+import Html.Events exposing (onInput, onClick)
 
 
 ---- MODEL ----
 
 
+type Visibility
+    = Hidden
+    | Visible
+
+
+type alias LoginPayload =
+    { username : String
+    , password : String
+    }
+
+
 type alias Model =
     { leftUrl : String
     , rightUrl : String
+    , controlVisibility : Visibility
+    , loginVisibility : Visibility
+    , username : String
+    , password : String
     }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( { leftUrl = "", rightUrl = "" }, Cmd.none )
+    ( { leftUrl = ""
+      , rightUrl = ""
+      , controlVisibility = Visible
+      , loginVisibility = Hidden
+      , username = ""
+      , password = ""
+      }
+    , Cmd.none
+    )
 
 
 
@@ -24,18 +48,37 @@ init =
 
 type Msg
     = NoOp
-    | UpdateLeftUrl
-    | UpdateRightUrl
+    | UpdateLeftUrl String
+    | UpdateRightUrl String
     | StartLogin
-    | UpdateUsername
-    | UpdatePassword
-    | SubmitLogin
-    | CancelLogin
+    | UpdateUsername String
+    | UpdatePassword String
+    | SubmitLogin LoginPayload
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    ( model, Cmd.none )
+    case msg of
+        NoOp ->
+            ( model, Cmd.none )
+
+        UpdateLeftUrl url ->
+            ( { model | leftUrl = url }, Cmd.none )
+
+        UpdateRightUrl url ->
+            ( { model | rightUrl = url }, Cmd.none )
+
+        StartLogin ->
+            ( { model | loginVisibility = Visible }, Cmd.none )
+
+        UpdateUsername username ->
+            ( { model | username = username }, Cmd.none )
+
+        UpdatePassword password ->
+            ( { model | password = password }, Cmd.none )
+
+        SubmitLogin loginPayload ->
+            ( { model | username = "", password = "" }, Cmd.none )
 
 
 
@@ -51,22 +94,38 @@ navbar model =
         ]
         [ input
             [ class "url-control"
+            , type_ "text"
             , placeholder "Layer URL for left pane"
+            , onInput UpdateLeftUrl
+            , value model.leftUrl
             ]
             []
         , input
             [ class "url-control"
+            , type_ "text"
             , placeholder "Layer URL for right pane"
+            , onInput UpdateRightUrl
+            , value model.rightUrl
             ]
             []
-        , button [ class "login-button" ] [ text "Use Raster Foundry credentials" ]
+        , button
+            [ class "login-button"
+            , type_ "button"
+            ]
+            [ text "Use Raster Foundry credentials" ]
         , button
             [ classList
                 [ ( "collapse-button", True )
                 , ( "expand-button", False )
                 ]
             ]
-            []
+            [ text
+                (if model.controlVisibility == Hidden then
+                    "Expand"
+                 else
+                    "Hide"
+                )
+            ]
         ]
 
 
