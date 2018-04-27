@@ -1,19 +1,21 @@
 module Main exposing (..)
 
-import Html exposing (Html, text, div, h1, img)
-import Html.Attributes exposing (src)
+import Html exposing (Html, text, div, h1, img, input, button)
+import Html.Attributes exposing (src, class, classList, placeholder)
 
 
 ---- MODEL ----
 
 
 type alias Model =
-    {}
+    { leftUrl : String
+    , rightUrl : String
+    }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( {}, Cmd.none )
+    ( { leftUrl = "", rightUrl = "" }, Cmd.none )
 
 
 
@@ -22,6 +24,13 @@ init =
 
 type Msg
     = NoOp
+    | UpdateLeftUrl
+    | UpdateRightUrl
+    | StartLogin
+    | UpdateUsername
+    | UpdatePassword
+    | SubmitLogin
+    | CancelLogin
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -33,11 +42,46 @@ update msg model =
 ---- VIEW ----
 
 
-view : Model -> Html Msg
-view model =
-    div []
-        [ img [ src "/logo.svg" ] []
-        , h1 [] [ text "Your Elm App is working!" ]
+navbar : Model -> Html Msg
+navbar model =
+    div
+        [ classList
+            [ ( "layer-controls", True )
+            ]
+        ]
+        [ input
+            [ class "url-control"
+            , placeholder "Layer URL for left pane"
+            ]
+            []
+        , input
+            [ class "url-control"
+            , placeholder "Layer URL for right pane"
+            ]
+            []
+        , button [ class "login-button" ] [ text "Use Raster Foundry credentials" ]
+        , button
+            [ classList
+                [ ( "collapse-button", True )
+                , ( "expand-button", False )
+                ]
+            ]
+            []
+        ]
+
+
+mapcontainer : Model -> Html Msg
+mapcontainer model =
+    div [ class "map-container" ] [ text "Map goes here" ]
+
+
+root : Model -> Html Msg
+root model =
+    div
+        [ class "app-content"
+        ]
+        [ navbar model
+        , mapcontainer model
         ]
 
 
@@ -48,7 +92,7 @@ view model =
 main : Program Never Model Msg
 main =
     Html.program
-        { view = view
+        { view = root
         , init = init
         , update = update
         , subscriptions = always Sub.none
