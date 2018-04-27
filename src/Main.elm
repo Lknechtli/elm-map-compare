@@ -1,8 +1,22 @@
-module Main exposing (..)
+port module Main exposing (..)
 
 import Html exposing (Html, text, div, h1, img, input, button)
-import Html.Attributes exposing (src, class, classList, placeholder, type_, value)
-import Html.Events exposing (onInput, onClick)
+import Html.Attributes exposing (..)
+import Html.Events exposing (onInput, onClick, onWithOptions)
+import Json.Decode as Json
+
+
+--- PORTS ---
+
+
+type alias Event =
+    { name : String
+    , data : String
+    }
+
+
+port mapEvent : Event -> Cmd msg
+
 
 
 ---- MODEL ----
@@ -38,7 +52,7 @@ init =
       , username = ""
       , password = ""
       }
-    , Cmd.none
+    , mapEvent { name = "mapInit", data = "" }
     )
 
 
@@ -54,6 +68,7 @@ type Msg
     | UpdateUsername String
     | UpdatePassword String
     | SubmitLogin LoginPayload
+    | ToggleTopbar
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -63,10 +78,10 @@ update msg model =
             ( model, Cmd.none )
 
         UpdateLeftUrl url ->
-            ( { model | leftUrl = url }, Cmd.none )
+            ( { model | leftUrl = url }, mapEvent { name = "UpdateLeftUrl", data = url } )
 
         UpdateRightUrl url ->
-            ( { model | rightUrl = url }, Cmd.none )
+            ( { model | rightUrl = url }, mapEvent { name = "UpdateRightUrl", data = url } )
 
         StartLogin ->
             ( { model | loginVisibility = Visible }, Cmd.none )
@@ -80,6 +95,12 @@ update msg model =
         SubmitLogin loginPayload ->
             ( { model | username = "", password = "" }, Cmd.none )
 
+        ToggleTopbar ->
+            if (model.controlVisibility == Hidden) then
+                ( { model | controlVisibility = Visible }, Cmd.none )
+            else
+                ( { model | controlVisibility = Hidden }, Cmd.none )
+
 
 
 ---- VIEW ----
@@ -90,6 +111,7 @@ navbar model =
     div
         [ classList
             [ ( "layer-controls", True )
+            , ( "controls-hidden", model.controlVisibility == Hidden )
             ]
         ]
         [ input
@@ -111,27 +133,58 @@ navbar model =
         , button
             [ class "login-button"
             , type_ "button"
+            , onWithOptions
+                "click"
+                { stopPropagation = True, preventDefault = True }
+                (Json.succeed StartLogin)
             ]
             [ text "Use Raster Foundry credentials" ]
         , button
             [ classList
-                [ ( "collapse-button", True )
-                , ( "expand-button", False )
+                [ ( "collapse-button", model.controlVisibility == Visible )
+                , ( "expand-button", model.controlVisibility == Hidden )
                 ]
+            , onWithOptions
+                "click"
+                { stopPropagation = True, preventDefault = True }
+                (Json.succeed ToggleTopbar)
             ]
             [ text
                 (if model.controlVisibility == Hidden then
-                    "Expand"
+                    "vvv"
                  else
-                    "Hide"
+                    "^^^"
                 )
             ]
         ]
 
 
+login : Model -> Html Msg
+login model =
+    div [ class "login-form" ]
+        [ input
+            [ class "login-input"
+            , type_ "text"
+            , value model.username
+            , onInput UpdateUsername
+            ]
+            []
+        , input
+            [ class "login-input"
+            , type_ "password"
+            , value model.username
+            , onInput UpdatePassword
+            ]
+            []
+        ]
+
+
 mapcontainer : Model -> Html Msg
 mapcontainer model =
-    div [ class "map-container" ] [ text "Map goes here" ]
+    div [ class "map-container" ]
+        [ div [ id "before", class "map" ] []
+        , div [ id "after", class "map" ] []
+        ]
 
 
 root : Model -> Html Msg
@@ -139,7 +192,10 @@ root model =
     div
         [ class "app-content"
         ]
-        [ navbar model
+        [ if (model.loginVisibility == Hidden) then
+            navbar model
+          else
+            login model
         , mapcontainer model
         ]
 

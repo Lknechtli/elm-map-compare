@@ -4,6 +4,8 @@
     "main": "index.js",
     "license": "MIT",
     "dependencies": {
+        "mapbox-gl": "^0.45.0-beta.1",
+        "mapbox-gl-compare": "^0.1.0",
         "node-sass-chokidar": "^1.2.2"
     },
     "scripts": {
