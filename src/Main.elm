@@ -4,6 +4,7 @@ import Html exposing (Html, text, div, h1, img, input, button)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput, onClick, onWithOptions)
 import Json.Decode as Json
+import Regex
 
 
 --- PORTS ---
@@ -36,6 +37,8 @@ type alias LoginPayload =
 type alias Model =
     { leftUrl : String
     , rightUrl : String
+    , leftUrlIsValid : Bool
+    , rightUrlIsValid : Bool
     , controlVisibility : Visibility
     , loginVisibility : Visibility
     , username : String
@@ -47,6 +50,8 @@ init : ( Model, Cmd Msg )
 init =
     ( { leftUrl = ""
       , rightUrl = ""
+      , leftUrlIsValid = False
+      , rightUrlIsValid = False
       , controlVisibility = Visible
       , loginVisibility = Hidden
       , username = ""
@@ -65,6 +70,7 @@ type Msg
     | UpdateLeftUrl String
     | UpdateRightUrl String
     | StartLogin
+    | CancelLogin
     | UpdateUsername String
     | UpdatePassword String
     | SubmitLogin LoginPayload
@@ -78,13 +84,26 @@ update msg model =
             ( model, Cmd.none )
 
         UpdateLeftUrl url ->
-            ( { model | leftUrl = url }, mapEvent { name = "UpdateLeftUrl", data = url } )
+            if (Regex.contains (Regex.regex "(?=.*{z})(?=.*{x})(?=.*{y})") url) then
+                ( { model | leftUrl = url, leftUrlIsValid = True }
+                , mapEvent { name = "UpdateLeftUrl", data = url }
+                )
+            else
+                ( { model | leftUrl = url, leftUrlIsValid = False }, Cmd.none )
 
         UpdateRightUrl url ->
-            ( { model | rightUrl = url }, mapEvent { name = "UpdateRightUrl", data = url } )
+            if (Regex.contains (Regex.regex "(?=.*{z})(?=.*{x})(?=.*{y})") url) then
+                ( { model | rightUrl = url, rightUrlIsValid = True }
+                , mapEvent { name = "UpdateRightUrl", data = url }
+                )
+            else
+                ( { model | rightUrl = url, rightUrlIsValid = False }, Cmd.none )
 
         StartLogin ->
             ( { model | loginVisibility = Visible }, Cmd.none )
+
+        CancelLogin ->
+            ( { model | loginVisibility = Hidden }, Cmd.none )
 
         UpdateUsername username ->
             ( { model | username = username }, Cmd.none )
@@ -115,7 +134,10 @@ navbar model =
             ]
         ]
         [ input
-            [ class "url-control"
+            [ classList
+                [ ( "input-control", True )
+                , ( "form-invalid", not model.leftUrlIsValid )
+                ]
             , type_ "text"
             , placeholder "Layer URL for left pane"
             , onInput UpdateLeftUrl
@@ -123,7 +145,10 @@ navbar model =
             ]
             []
         , input
-            [ class "url-control"
+            [ classList
+                [ ( "input-control", True )
+                , ( "form-invalid", not model.rightUrlIsValid )
+                ]
             , type_ "text"
             , placeholder "Layer URL for right pane"
             , onInput UpdateRightUrl
@@ -151,9 +176,9 @@ navbar model =
             ]
             [ text
                 (if model.controlVisibility == Hidden then
-                    "vvv"
+                    "Show urls"
                  else
-                    "^^^"
+                    "Hide urls"
                 )
             ]
         ]
@@ -163,19 +188,34 @@ login : Model -> Html Msg
 login model =
     div [ class "login-form" ]
         [ input
-            [ class "login-input"
+            [ class "input-control"
             , type_ "text"
             , value model.username
             , onInput UpdateUsername
+            , placeholder "Username"
             ]
             []
         , input
-            [ class "login-input"
+            [ class "input-control"
             , type_ "password"
             , value model.username
             , onInput UpdatePassword
+            , placeholder "Password"
             ]
             []
+        , button
+            [ class "login-button"
+            , type_ "button"
+            ]
+            [ text "Log In" ]
+        , button
+            [ class "login-button"
+            , type_ "button"
+            , onWithOptions "click"
+                { stopPropagation = True, preventDefault = True }
+                (Json.succeed CancelLogin)
+            ]
+            [ text "Cancel" ]
         ]
 
 

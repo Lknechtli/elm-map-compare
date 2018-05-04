@@ -20,12 +20,18 @@ body {
 }
 
 .layer-controls {
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right:0;
+    z-index: 10000;
+    /* position: relative; */
     display: flex;
     padding: 0.5em;
     :last-child {
         flex: 1;
     }
+    pointer-events: none;
     &.controls-hidden {
         height: 0;
         padding: 0;
@@ -36,15 +42,30 @@ body {
             display: none;
         }
         .expand-button {
-            top: 0;
-            bottom: initial;
-            left: 50%;
-            transform: translateX(-50%);
+            opacity: 0.4;
+            &:hover {
+                opacity: 1;
+                background: white;
+            }
         }
     }
 }
 
-.url-control {
+.login-form {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10000;
+    padding: 0.5em;
+    pointer-events: none;
+    * {
+        pointer-events: auto;
+    }
+}
+
+.input-control {
+    pointer-events: auto;
     padding: 0.2em;
     border-radius: 3px;
     border: 1px solid #ddd;
@@ -53,8 +74,10 @@ body {
 }
 
 .login-button {
-    background: #aaf;
+    background: #465076;
+    color: white;
     border: 1px solid #ddd;
+    pointer-events: auto;
 }
 
 .map-container {
@@ -73,9 +96,9 @@ body {
 .collapse-button, .expand-button {
     z-index: 10000;
     position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateY(80%) translateX(-50%);
+    top: 1em;
+    right: 1em;
+    /* transform: translateY(80%) translateX(-50%); */
     background: white;
     border: 1px solid #ddd;
     &:hover {
@@ -94,4 +117,16 @@ button {
 
 .mapboxgl-canvas {
     left: 0;
+}
+
+.form-invalid {
+    border: 1px solid #f11;
+}
+
+.mapboxgl-compare {
+    pointer-events: none;
+    user-select: none;
+    .compare-swiper {
+        pointer-events: auto;
+    }
 }
