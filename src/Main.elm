@@ -1,6 +1,6 @@
 port module Main exposing (..)
 
-import Html exposing (Html, text, div, h1, img, input, button)
+import Html exposing (Html, text, div, h1, img, input, button, span)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput, onClick, onWithOptions)
 import Json.Decode as Json
@@ -125,6 +125,26 @@ update msg model =
 ---- VIEW ----
 
 
+urlInput : String -> String -> Bool -> (String -> Msg) -> Html Msg
+urlInput valueText placeholderText isValid inputMsg =
+    div
+        [ classList [ ( "url-input", True ) ]
+        ]
+        [ input
+            [ classList
+                [ ( "input-control", True )
+                , ( "form-invalid", not isValid )
+                ]
+            , type_ "text"
+            , placeholder placeholderText
+            , onInput inputMsg
+            , value valueText
+            ]
+            []
+        , span [ class "help-tag" ] [ text "?" ]
+        ]
+
+
 navbar : Model -> Html Msg
 navbar model =
     div
@@ -133,28 +153,31 @@ navbar model =
             , ( "controls-hidden", model.controlVisibility == Hidden )
             ]
         ]
-        [ input
-            [ classList
-                [ ( "input-control", True )
-                , ( "form-invalid", not model.leftUrlIsValid )
-                ]
-            , type_ "text"
-            , placeholder "Layer URL for left pane"
-            , onInput UpdateLeftUrl
-            , value model.leftUrl
-            ]
-            []
-        , input
-            [ classList
-                [ ( "input-control", True )
-                , ( "form-invalid", not model.rightUrlIsValid )
-                ]
-            , type_ "text"
-            , placeholder "Layer URL for right pane"
-            , onInput UpdateRightUrl
-            , value model.rightUrl
-            ]
-            []
+        [ urlInput model.leftUrl "Layer URL for left pane" model.leftUrlIsValid UpdateLeftUrl
+        , urlInput model.rightUrl "Layer URL for Right pane" model.rightUrlIsValid UpdateRightUrl
+
+        -- input
+        --    [ classList
+        --        [ ( "input-control", True )
+        --        , ( "form-invalid", not model.leftUrlIsValid )
+        --        ]
+        --    , type_ "text"
+        --    , placeholder "Layer URL for left pane"
+        --    , onInput UpdateLeftUrl
+        --    , value model.leftUrl
+        --    ]
+        --    []
+        -- , input
+        --     [ classList
+        --         [ ( "input-control", True )
+        --         , ( "form-invalid", not model.rightUrlIsValid )
+        --         ]
+        --     , type_ "text"
+        --     , placeholder "Layer URL for right pane"
+        --     , onInput UpdateRightUrl
+        --     , value model.rightUrl
+        --     ]
+        --     []
         , button
             [ class "login-button"
             , type_ "button"
