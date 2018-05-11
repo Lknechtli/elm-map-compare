@@ -5,6 +5,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onInput, onClick, onWithOptions)
 import Json.Decode as Json
 import Regex
+import String exposing (isEmpty)
 
 
 --- PORTS ---
@@ -41,6 +42,7 @@ type alias Model =
     , rightUrlIsValid : Bool
     , controlVisibility : Visibility
     , loginVisibility : Visibility
+    , modalText : String
     , username : String
     , password : String
     }
@@ -54,6 +56,7 @@ init =
       , rightUrlIsValid = False
       , controlVisibility = Visible
       , loginVisibility = Hidden
+      , modalText = ""
       , username = ""
       , password = ""
       }
@@ -75,6 +78,7 @@ type Msg
     | UpdatePassword String
     | SubmitLogin LoginPayload
     | ToggleTopbar
+    | ToggleHelpModal
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -120,9 +124,27 @@ update msg model =
             else
                 ( { model | controlVisibility = Hidden }, Cmd.none )
 
+        ToggleHelpModal ->
+            if (isEmpty model.modalText) then
+                ( { model | modalText = "Layer urls must be of form \"https://tileserver.com/layer/{z}/{x}/{y}.png\"" }, Cmd.none )
+            else
+                ( { model | modalText = "" }, Cmd.none )
+
 
 
 ---- VIEW ----
+
+
+modal : String -> Html Msg
+modal displayText =
+    div [ class "modal-container" ]
+        [ div [ class "modal-header" ]
+            [ div [ class "modal-text" ] [ text "Help" ]
+            , button [ class "close-button" ] [ text "X" ]
+            ]
+        , div [ class "modal-body" ]
+            [ text displayText ]
+        ]
 
 
 urlInput : String -> String -> Bool -> (String -> Msg) -> Html Msg
@@ -239,6 +261,10 @@ root model =
           else
             login model
         , mapcontainer model
+        , if (not (isEmpty model.modalText)) then
+            modal model.modalText
+          else
+            text ""
         ]
 
 
