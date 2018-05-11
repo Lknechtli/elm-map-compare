@@ -25,12 +25,8 @@ body {
     left: 0;
     right:0;
     z-index: 10000;
-    /* position: relative; */
     display: flex;
     padding: 0.5em;
-    :last-child {
-        flex: 1;
-    }
     pointer-events: none;
     &.controls-hidden {
         height: 0;
@@ -70,6 +66,8 @@ body {
     margin-right: 1em;
     display: flex;
     flex-direction: row;
+    justify-content: flex-start;
+    align-items: middle;
 }
 
 .input-control {
@@ -79,8 +77,12 @@ body {
     border-radius: 3px;
     border: 1px solid #ddd;
 }
-.help-tag {
-    flex: 0;
+
+.help-button {
+    pointer-events: auto;
+    width: 2em;
+    border: 1px solid transparent;
+    background: transparent;
 }
 
 .login-button {

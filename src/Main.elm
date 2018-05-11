@@ -141,7 +141,9 @@ urlInput valueText placeholderText isValid inputMsg =
             , value valueText
             ]
             []
-        , span [ class "help-tag" ] [ text "?" ]
+        , button [ class "help-button" ]
+            [ text "?"
+            ]
         ]
 
 
@@ -155,29 +157,6 @@ navbar model =
         ]
         [ urlInput model.leftUrl "Layer URL for left pane" model.leftUrlIsValid UpdateLeftUrl
         , urlInput model.rightUrl "Layer URL for Right pane" model.rightUrlIsValid UpdateRightUrl
-
-        -- input
-        --    [ classList
-        --        [ ( "input-control", True )
-        --        , ( "form-invalid", not model.leftUrlIsValid )
-        --        ]
-        --    , type_ "text"
-        --    , placeholder "Layer URL for left pane"
-        --    , onInput UpdateLeftUrl
-        --    , value model.leftUrl
-        --    ]
-        --    []
-        -- , input
-        --     [ classList
-        --         [ ( "input-control", True )
-        --         , ( "form-invalid", not model.rightUrlIsValid )
-        --         ]
-        --     , type_ "text"
-        --     , placeholder "Layer URL for right pane"
-        --     , onInput UpdateRightUrl
-        --     , value model.rightUrl
-        --     ]
-        --     []
         , button
             [ class "login-button"
             , type_ "button"
