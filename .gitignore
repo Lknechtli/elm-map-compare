@@ -14,4 +14,4 @@ node_modules
 .DS_Store
 
 *.css
-./elm.js
+elm.js
