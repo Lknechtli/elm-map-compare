@@ -139,8 +139,8 @@ button {
 }
 
 .mapboxgl-compare {
-    pointer-events: none;
-    user-select: none;
+    // pointer-events: none;
+    // user-select: none;
     .compare-swiper {
         pointer-events: auto;
     }

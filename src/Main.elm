@@ -222,7 +222,7 @@ login model =
         , input
             [ class "input-control"
             , type_ "password"
-            , value model.username
+            , value model.password
             , onInput UpdatePassword
             , placeholder "Password"
             ]
