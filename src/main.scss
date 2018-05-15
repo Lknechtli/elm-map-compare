@@ -57,6 +57,7 @@ body {
     right: 0;
     z-index: 10000;
     padding: 0.5em;
+    display: flex;
     pointer-events: none;
     * {
         pointer-events: auto;

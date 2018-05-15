@@ -29,12 +29,6 @@ type Visibility
     | Visible
 
 
-type alias LoginPayload =
-    { username : String
-    , password : String
-    }
-
-
 type alias Model =
     { leftUrl : String
     , rightUrl : String
@@ -43,8 +37,7 @@ type alias Model =
     , controlVisibility : Visibility
     , loginVisibility : Visibility
     , modalText : String
-    , username : String
-    , password : String
+    , apiToken : String
     }
 
 
@@ -57,8 +50,7 @@ init =
       , controlVisibility = Visible
       , loginVisibility = Hidden
       , modalText = ""
-      , username = ""
-      , password = ""
+      , apiToken = ""
       }
     , mapEvent { name = "mapInit", data = "" }
     )
@@ -73,10 +65,9 @@ type Msg
     | UpdateLeftUrl String
     | UpdateRightUrl String
     | StartLogin
+    | FinishLogin
     | CancelLogin
-    | UpdateUsername String
-    | UpdatePassword String
-    | SubmitLogin LoginPayload
+    | UpdateToken String
     | ToggleTopbar
     | ToggleHelpModal
 
@@ -107,16 +98,13 @@ update msg model =
             ( { model | loginVisibility = Visible }, Cmd.none )
 
         CancelLogin ->
+            ( { model | apiToken = "", loginVisibility = Hidden }, Cmd.none )
+
+        FinishLogin ->
             ( { model | loginVisibility = Hidden }, Cmd.none )
 
-        UpdateUsername username ->
-            ( { model | username = username }, Cmd.none )
-
-        UpdatePassword password ->
-            ( { model | password = password }, Cmd.none )
-
-        SubmitLogin loginPayload ->
-            ( { model | username = "", password = "" }, Cmd.none )
+        UpdateToken token ->
+            ( { model | apiToken = token }, Cmd.none )
 
         ToggleTopbar ->
             if (model.controlVisibility == Hidden) then
@@ -187,7 +175,9 @@ navbar model =
                 { stopPropagation = True, preventDefault = True }
                 (Json.succeed StartLogin)
             ]
-            [ text "Use Raster Foundry credentials" ]
+            [ 
+                text (if (isEmpty model.apiToken) then "Set Raster Foundry Token" else "Change Token")
+            ]
         , button
             [ classList
                 [ ( "collapse-button", model.controlVisibility == Visible )
@@ -214,24 +204,20 @@ login model =
         [ input
             [ class "input-control"
             , type_ "text"
-            , value model.username
-            , onInput UpdateUsername
-            , placeholder "Username"
-            ]
-            []
-        , input
-            [ class "input-control"
-            , type_ "password"
-            , value model.password
-            , onInput UpdatePassword
-            , placeholder "Password"
+            , value model.apiToken
+            , onInput UpdateToken
+            , placeholder "Rasterfoundry API Token"
             ]
             []
         , button
             [ class "login-button"
             , type_ "button"
+            , onWithOptions "click" {
+                stopPropagation = True, preventDefault = True
+            }
+            (Json.succeed FinishLogin)
             ]
-            [ text "Log In" ]
+            [ text "Save Token" ]
         , button
             [ class "login-button"
             , type_ "button"
@@ -239,7 +225,7 @@ login model =
                 { stopPropagation = True, preventDefault = True }
                 (Json.succeed CancelLogin)
             ]
-            [ text "Cancel" ]
+            [ text "Clear Token" ]
         ]
 
 
